@@ -1,3 +1,4 @@
+const _ = require("lodash");
 const { User, validate } = require("./userModel");
 
 module.exports.userRegister = async (req, res) => {
@@ -7,11 +8,7 @@ module.exports.userRegister = async (req, res) => {
   let user = await User.findOne({ username: req.body.username });
   if (user) return res.status(400).send("User already registred.");
 
-  user = new User({
-    username: req.body.username,
-    password: req.body.password,
-    deposit: req.body.deposit,
-  });
+  user = new User(_.pick(req.body, ["username", "password", "deposit"]));
   await user.save();
-  res.send(user);
+  res.send(_.pick(user, ["_id", "username", "deposit"]));
 };
