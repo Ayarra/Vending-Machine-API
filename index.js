@@ -7,6 +7,7 @@ const port = 3000;
 
 //Importing Routes
 const users = require("./components/User/userRoute");
+const auth = require("./components/Auth/authRoute");
 
 //Setting up the DB
 mongoose.connect(
@@ -23,6 +24,7 @@ app.use(express.json());
 
 //Routes
 app.use("/users", users);
+app.use("/auth", auth);
 
 // Root route of express app
 app.use("/", (req, res) => {
