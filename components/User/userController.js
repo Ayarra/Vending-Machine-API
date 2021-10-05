@@ -1,4 +1,5 @@
 const _ = require("lodash");
+const bcrypt = require("bcrypt");
 const { User, validate } = require("./userModel");
 
 module.exports.userRegister = async (req, res) => {
@@ -9,6 +10,9 @@ module.exports.userRegister = async (req, res) => {
   if (user) return res.status(400).send("User already registred.");
 
   user = new User(_.pick(req.body, ["username", "password", "deposit"]));
+  const salt = await bcrypt.genSalt(10);
+  user.password = await bcrypt.hash(user.password, salt);
+
   await user.save();
   res.send(_.pick(user, ["_id", "username", "deposit"]));
 };
