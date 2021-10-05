@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Joi = require("joi");
+const jwt = require("jsonwebtoken");
 
 let UserSchema = new mongoose.Schema({
   username: {
@@ -20,6 +21,14 @@ let UserSchema = new mongoose.Schema({
   isBuyer: Boolean,
   isSeller: Boolean,
 });
+
+UserSchema.methods.generateAuthToken = function () {
+  const jwtToken = jwt.sign(
+    { _id: this._id },
+    process.env.VENDINGMACHINE_JWT_PRIVATEKEY
+  );
+  return jwtToken;
+};
 
 const validateUser = (user) => {
   const schema = Joi.object({

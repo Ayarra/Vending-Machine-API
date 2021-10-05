@@ -14,5 +14,9 @@ module.exports.userRegister = async (req, res) => {
   user.password = await bcrypt.hash(user.password, salt);
 
   await user.save();
-  res.send(_.pick(user, ["_id", "username", "deposit"]));
+
+  const jwtToken = user.generateAuthToken();
+  res
+    .header("x-auth-token", jwtToken)
+    .send(_.pick(user, ["_id", "username", "deposit"]));
 };

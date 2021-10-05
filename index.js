@@ -5,13 +5,18 @@ require("dotenv").config();
 const app = express();
 const port = 3000;
 
+if (!process.env.VENDINGMACHINE_JWT_PRIVATEKEY) {
+  console.error("FATAL ERROR: jwtProvateKey is not defined.");
+  process.exit(1);
+}
+
 //Importing Routes
 const users = require("./components/User/userRoute");
 const auth = require("./components/Auth/authRoute");
 
 //Setting up the DB
 mongoose.connect(
-  `mongodb+srv://hhamdaou:${process.env.DB_PASSWORD}@cluster0.yupbg.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
+  `mongodb+srv://${process.env.VENDINGMACHINE_DB_USER}:${process.env.VENDINGMACHINE_DB_PASSWORD}@cluster0.yupbg.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
 );
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "MongoDB connection error: "));
