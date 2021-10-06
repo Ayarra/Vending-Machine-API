@@ -16,6 +16,7 @@ const users = require("./components/User/userRoute");
 const auth = require("./components/Auth/authRoute");
 const deposit = require("./components/Deposit/depositRoute");
 const buy = require("./components/Buy/buyRoute");
+const reset = require("./components/Reset/resetRoute");
 
 //Setting up the DB
 // mongoose.connect(
@@ -40,6 +41,7 @@ app.use("/users", users);
 app.use("/auth", auth);
 app.use("/deposit", deposit);
 app.use("/buy", buy);
+app.use("/reset", reset);
 
 app.use("/", (req, res) => {
   res.status(404).send("Not Found.");

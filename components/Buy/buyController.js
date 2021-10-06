@@ -5,16 +5,6 @@ const { Product } = require("../Product/productModel");
 const { User } = require("../User/userModel");
 
 module.exports.buying = async (req, res) => {
-  // if (![5, 10, 20, 50, 100].includes(req.body.deposit))
-  //   return res
-  //     .status(400)
-  //     .send("The deposit must be a 5, 10, 20, 50 or 100 coins ");
-
-  // const user = await User.findById(req.user._id);
-
-  // user.deposit += req.body.deposit;
-  // await User.updateOne({ _id: req.user._id }, { deposit: user.deposit });
-  // res.send(`Deposit updated: ${user.deposit}`);
   const { error } = validateOperation(req.body);
   if (error) return res.status(400).send(error.details[0].message);
   if (mongoose.isValidObjectId(req.body.productId) || !req.body.productId) {
