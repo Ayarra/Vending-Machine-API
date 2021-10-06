@@ -39,7 +39,7 @@ app.use("/users", users);
 app.use("/auth", auth);
 app.use("/deposit", deposit);
 app.use("/", (req, res) => {
-  res.send("Allo");
+  res.status(404).send("Not Found.");
 });
 
 app.listen(port, () => {

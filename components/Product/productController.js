@@ -68,7 +68,6 @@ module.exports.deleteProduct = async (req, res) => {
   if (mongoose.isValidObjectId(req.params.id)) {
     const product = await Product.findById(req.params.id);
 
-    console.log(product);
     if (!product)
       return res
         .status(404)
