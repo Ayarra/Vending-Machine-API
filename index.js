@@ -11,13 +11,18 @@ if (!process.env.VENDINGMACHINE_JWT_PRIVATEKEY) {
 }
 
 //Importing Routes
+const products = require("./components/Product/productRoute");
 const users = require("./components/User/userRoute");
 const auth = require("./components/Auth/authRoute");
 
 //Setting up the DB
+// mongoose.connect(
+//   `mongodb+srv://${process.env.VENDINGMACHINE_DB_USER}:${process.env.VENDINGMACHINE_DB_PASSWORD}@cluster0.yupbg.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
+// );
 mongoose.connect(
-  `mongodb+srv://${process.env.VENDINGMACHINE_DB_USER}:${process.env.VENDINGMACHINE_DB_PASSWORD}@cluster0.yupbg.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
+  `mongodb://hhamdaou:hhamdaou@cluster0-shard-00-00.yupbg.mongodb.net:27017,cluster0-shard-00-01.yupbg.mongodb.net:27017,cluster0-shard-00-02.yupbg.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-g7jga6-shard-0&authSource=admin&retryWrites=true&w=majority`
 );
+
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "MongoDB connection error: "));
 db.once("open", function () {
@@ -28,12 +33,11 @@ db.once("open", function () {
 app.use(express.json());
 
 //Routes
+app.use("/products", products);
 app.use("/users", users);
 app.use("/auth", auth);
-
-// Root route of express app
 app.use("/", (req, res) => {
-  res.send("Bonjour");
+  res.send("Allo");
 });
 
 app.listen(port, () => {

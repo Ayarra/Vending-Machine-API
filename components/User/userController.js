@@ -9,7 +9,9 @@ module.exports.userRegister = async (req, res) => {
   let user = await User.findOne({ username: req.body.username });
   if (user) return res.status(400).send("User already registred.");
 
-  user = new User(_.pick(req.body, ["username", "password", "deposit"]));
+  user = new User(
+    _.pick(req.body, ["username", "password", "deposit", "isSeller", "isBuyer"])
+  );
   const salt = await bcrypt.genSalt(10);
   user.password = await bcrypt.hash(user.password, salt);
 
@@ -18,5 +20,5 @@ module.exports.userRegister = async (req, res) => {
   const jwtToken = user.generateAuthToken();
   res
     .header("x-auth-token", jwtToken)
-    .send(_.pick(user, ["_id", "username", "deposit"]));
+    .send(_.pick(user, ["_id", "username", "deposit", "isSeller", "isBuyer"]));
 };

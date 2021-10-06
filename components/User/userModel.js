@@ -17,14 +17,19 @@ let UserSchema = new mongoose.Schema({
     maxlength: 1024,
     required: true,
   },
+
   deposit: { type: Number, min: 0 },
-  isBuyer: Boolean,
-  isSeller: Boolean,
+  isBuyer: { type: Boolean, required: true },
+  isSeller: { type: Boolean, required: true },
+  date: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 UserSchema.methods.generateAuthToken = function () {
   const jwtToken = jwt.sign(
-    { _id: this._id },
+    { _id: this._id, isBuyer: this.isBuyer, isSeller: this.isSeller },
     process.env.VENDINGMACHINE_JWT_PRIVATEKEY
   );
   return jwtToken;
@@ -35,6 +40,8 @@ const validateUser = (user) => {
     username: Joi.string().min(3).max(50).required(),
     password: Joi.string().min(8).max(1024).required(),
     deposit: Joi.number().greater(0),
+    isBuyer: Joi.boolean().required(),
+    isSeller: Joi.boolean().required(),
   });
 
   return schema.validate(user);
