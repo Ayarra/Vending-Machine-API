@@ -20,7 +20,10 @@ module.exports.getProduct = async (req, res) => {
     res.send(
       _.pick(product, ["_id", "productName", "amountAvailable", "cost"])
     );
-  } else res.status(404).send("Invalid product Id");
+  } else {
+    console.log("object");
+    res.status(404).send("Invalid product Id");
+  }
 };
 
 module.exports.createProduct = async (req, res) => {

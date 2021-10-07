@@ -19,14 +19,14 @@ const buy = require("./components/Buy/buyRoute");
 const reset = require("./components/Reset/resetRoute");
 
 //// Dev Database
-// mongoose.connect(
-//   ` mongodb://hhamdaou:hhamdaou@cluster0-shard-00-00.yupbg.mongodb.net:27017,cluster0-shard-00-01.yupbg.mongodb.net:27017,cluster0-shard-00-02.yupbg.mongodb.net:27017/vendingMachineAPI?ssl=true&replicaSet=atlas-g7jga6-shard-0&authSource=admin&retryWrites=true&w=majority`
-// );
+mongoose.connect(
+  ` mongodb://${process.env.VENDINGMACHINE_DB_USER}:${process.env.VENDINGMACHINE_DB_VENDINGMACHINE_DB_PASSWORD}@cluster0-shard-00-00.yupbg.mongodb.net:27017,cluster0-shard-00-01.yupbg.mongodb.net:27017,cluster0-shard-00-02.yupbg.mongodb.net:27017/vendingMachineAPI?ssl=true&replicaSet=atlas-g7jga6-shard-0&authSource=admin&retryWrites=true&w=majority`
+);
 
 // Test Database
-mongoose.connect(
-  ` mongodb://hhamdaou:hhamdaou@cluster0-shard-00-00.yupbg.mongodb.net:27017,cluster0-shard-00-01.yupbg.mongodb.net:27017,cluster0-shard-00-02.yupbg.mongodb.net:27017/JestDB?ssl=true&replicaSet=atlas-g7jga6-shard-0&authSource=admin&retryWrites=true&w=majority`
-);
+// mongoose.connect(
+//   ` mongodb://${process.env.VENDINGMACHINE_DB_USER}:${process.env.VENDINGMACHINE_DB_VENDINGMACHINE_DB_PASSWORD}@cluster0-shard-00-00.yupbg.mongodb.net:27017,cluster0-shard-00-01.yupbg.mongodb.net:27017,cluster0-shard-00-02.yupbg.mongodb.net:27017/JestDB?ssl=true&replicaSet=atlas-g7jga6-shard-0&authSource=admin&retryWrites=true&w=majority`
+// );
 
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "MongoDB connection error: "));
@@ -54,5 +54,3 @@ const server = app.listen(port, () => {
 });
 
 module.exports = server;
-// feat fix chore refact
-// https://open.spotify.com/track/2LMq1O0NiqGhPOlXo3McYQ?si=2f402536ca8c4640
