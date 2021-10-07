@@ -17,7 +17,7 @@ module.exports.getUser = async (req, res) => {
       return res.status(404).send("The user with the given ID was not found");
 
     res.send(_.pick(user, ["_id", "username", "deposit"]));
-  } else res.status(400).send("Invalid user Id");
+  } else res.status(404).send("Invalid user Id");
 };
 
 module.exports.userRegister = async (req, res) => {
@@ -38,6 +38,7 @@ module.exports.userRegister = async (req, res) => {
   const jwtToken = user.generateAuthToken();
   res
     .header("x-auth-token", jwtToken)
+    .status(201)
     .send(_.pick(user, ["_id", "username", "deposit", "isSeller", "isBuyer"]));
 };
 
@@ -52,9 +53,9 @@ module.exports.updateUser = async (req, res) => {
 
     if (req.user._id === user._id.valueOf()) {
       await User.updateOne(user, req.body);
-      res.send(_.pick(user, ["username", "deposit"]));
-    } else res.status(400).send("Not valid user");
-  } else res.status(400).send("Invalid user Id");
+      res.status(201).send(_.pick(user, ["username", "deposit"]));
+    } else res.status(404).send("Not valid user");
+  } else res.status(404).send("Invalid user Id");
 };
 
 module.exports.deleteUser = async (req, res) => {
@@ -67,7 +68,7 @@ module.exports.deleteUser = async (req, res) => {
     if (req.user._id === user._id.valueOf()) {
       await Product.deleteMany({ sellerId: req.user._id });
       await User.deleteOne(user);
-      res.send(_.pick(user, ["username", "deposit"]));
-    } else res.status(400).send("Not valid user");
-  } else res.status(400).send("Invalid user Id");
+      res.status(202).send(_.pick(user, ["username", "deposit"]));
+    } else res.status(404).send("Not valid user");
+  } else res.status(404).send("Invalid user Id");
 };

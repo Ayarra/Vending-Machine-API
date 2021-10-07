@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 require("dotenv").config();
 
 const app = express();
-const port = 3000;
+const port = process.env.port || 3000;
 
 if (!process.env.VENDINGMACHINE_JWT_PRIVATEKEY) {
   console.error("FATAL ERROR: jwtProvateKey is not defined.");
@@ -18,12 +18,14 @@ const deposit = require("./components/Deposit/depositRoute");
 const buy = require("./components/Buy/buyRoute");
 const reset = require("./components/Reset/resetRoute");
 
-//Setting up the DB
+//// Dev Database
 // mongoose.connect(
-//   `mongodb+srv://${process.env.VENDINGMACHINE_DB_USER}:${process.env.VENDINGMACHINE_DB_PASSWORD}@cluster0.yupbg.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
+//   ` mongodb://hhamdaou:hhamdaou@cluster0-shard-00-00.yupbg.mongodb.net:27017,cluster0-shard-00-01.yupbg.mongodb.net:27017,cluster0-shard-00-02.yupbg.mongodb.net:27017/vendingMachineAPI?ssl=true&replicaSet=atlas-g7jga6-shard-0&authSource=admin&retryWrites=true&w=majority`
 // );
+
+// Test Database
 mongoose.connect(
-  `mongodb://hhamdaou:hhamdaou@cluster0-shard-00-00.yupbg.mongodb.net:27017,cluster0-shard-00-01.yupbg.mongodb.net:27017,cluster0-shard-00-02.yupbg.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-g7jga6-shard-0&authSource=admin&retryWrites=true&w=majority`
+  ` mongodb://hhamdaou:hhamdaou@cluster0-shard-00-00.yupbg.mongodb.net:27017,cluster0-shard-00-01.yupbg.mongodb.net:27017,cluster0-shard-00-02.yupbg.mongodb.net:27017/JestDB?ssl=true&replicaSet=atlas-g7jga6-shard-0&authSource=admin&retryWrites=true&w=majority`
 );
 
 const db = mongoose.connection;
@@ -47,9 +49,10 @@ app.use("/", (req, res) => {
   res.status(404).send("Not Found.");
 });
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Server is running at port ${port}`);
 });
 
+module.exports = server;
 // feat fix chore refact
 // https://open.spotify.com/track/2LMq1O0NiqGhPOlXo3McYQ?si=2f402536ca8c4640

@@ -41,7 +41,7 @@ module.exports.buying = async (req, res) => {
         }`
       );
     } else res.status(400).send("Not enough deposit.");
-  } else res.status(400).send("Invalid product Id");
+  } else res.status(404).send("Invalid product Id");
 };
 
 const validateOperation = (operation) => {

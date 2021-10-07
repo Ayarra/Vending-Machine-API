@@ -20,7 +20,7 @@ module.exports.getProduct = async (req, res) => {
     res.send(
       _.pick(product, ["_id", "productName", "amountAvailable", "cost"])
     );
-  } else res.status(400).send("Invalid product Id");
+  } else res.status(404).send("Invalid product Id");
 };
 
 module.exports.createProduct = async (req, res) => {
@@ -60,8 +60,8 @@ module.exports.updateProduct = async (req, res) => {
       res.send(
         _.pick(product, ["_id", "productName", "amountAvailable", "cost"])
       );
-    } else res.status(400).send("Not valid seller");
-  } else res.status(400).send("Invalid product Id");
+    } else res.status(404).send("Not valid seller");
+  } else res.status(404).send("Invalid product Id");
 };
 
 module.exports.deleteProduct = async (req, res) => {
@@ -78,6 +78,6 @@ module.exports.deleteProduct = async (req, res) => {
       res.send(
         _.pick(product, ["_id", "productName", "amountAvailable", "cost"])
       );
-    } else res.status(400).send("Not valid seller");
-  } else res.status(400).send("Invalid product Id");
+    } else res.status(404).send("Not valid seller");
+  } else res.status(404).send("Invalid product Id");
 };

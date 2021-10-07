@@ -1,45 +1,190 @@
-const mongoose = require("mongoose");
-const app = require("../../index");
-const supertest = require("supertest");
-const request = supertest(app);
-const bcrypt = require("bcrypt");
-const { User } = require("../User/userModel");
+const request = require("supertest");
+const { User } = require("./userModel");
 
-describe("User managment", () => {
-  beforeAll(async () => {
-    await mongoose.connect(
-      `mongodb://hhamdaou:hhamdaou@cluster0-shard-00-00.yupbg.mongodb.net:27017,cluster0-shard-00-01.yupbg.mongodb.net:27017,cluster0-shard-00-02.yupbg.mongodb.net:27017/${process.env.VENDINGMACHINE_TESTDB}?ssl=true&replicaSet=atlas-g7jga6-shard-0&authSource=admin&retryWrites=true&w=majority`
-    );
+let server;
+
+describe("Users", () => {
+  beforeEach(() => {
+    server = require("../../index");
+  });
+  afterEach(async () => {
+    server.close();
+    await User.deleteMany({});
   });
 
-  it("Async test", async () => {
-    const register = {
-      username: "youes",
-      password: "12345678",
-      deposit: 1564,
-      isSeller: true,
-      isBuyer: true,
-    };
+  describe("GET /", () => {
+    it("should return 401 if user is not logged in", async () => {
+      const res = await request(server).get("/users");
 
-    const res = await request.post("/users").send(register);
-    // const salt = await bcrypt.genSalt(10);
-    // register.password = await bcrypt.hash(register.password, salt);
-    const user = await User.findOne({ username: register.username });
-    // console.log(user._id.valueOf());
-    expect(res.status).toBe(200);
-
-    expect(res.body).toStrictEqual({
-      _id: user._id.valueOf(),
-      username: user.username,
-      deposit: user.deposit,
-      isSeller: user.isSeller,
-      isBuyer: user.isBuyer,
+      expect(res.status).toBe(401);
     });
-    // const validpassword = await bcrypt.compare(
-    //   regiter.password,
-    //   res.body.password
-    // );
-    // expect(validpassword).toBe(true);
-    // expect(data).toBe("peanut butter");
+    it("should return users if user is logged in", async () => {
+      const token = new User().generateAuthToken();
+
+      const res = await request(server)
+        .get("/users")
+        .set("x-auth-token", token);
+
+      expect(res.status).toBe(200);
+    });
+  });
+
+  describe("POST /", () => {
+    it("should return a 400 status if other than the Deposit is not included", async () => {
+      const res = await request(server).post("/users").send({
+        username: "username",
+        password: "password",
+        isBuyer: false,
+      });
+      expect(res.status).toBe(400);
+    });
+
+    it("should return a 400 if username input is not validated", async () => {
+      const res = await request(server).post("/users").send({
+        username: "ue",
+        password: "password",
+        isSeller: true,
+        isBuyer: false,
+      });
+      expect(res.status).toBe(400);
+    });
+
+    // SAME LOGIC CAN BE APPLIED FOR OTHER INPUT VALIDATION
+
+    it("should return a 400 if a user is already registered", async () => {
+      const user = new User({
+        username: "username",
+        password: "12345678",
+        isSeller: true,
+        isBuyer: true,
+      });
+      await user.save();
+
+      const res = await request(server).post("/users").send({
+        username: "username",
+        password: "password",
+        isSeller: true,
+        isBuyer: false,
+      });
+      expect(res.status).toBe(400);
+    });
+
+    it("should return a 201 if a user succesfully got registred", async () => {
+      const res = await request(server).post("/users").send({
+        username: "username",
+        password: "password",
+        isSeller: true,
+        isBuyer: false,
+      });
+      expect(res.status).toBe(201);
+    });
+  });
+
+  describe("PUT /:id", () => {
+    it("should return a 400 status if other than the Deposit is not included", async () => {
+      const token = new User().generateAuthToken();
+      const res = await request(server)
+        .put("/users/:id")
+        .set("x-auth-token", token)
+        .send({
+          username: "username",
+          password: "password",
+          isBuyer: false,
+        });
+      expect(res.status).toBe(400);
+    });
+
+    it("should return a 400 if username input is not validated", async () => {
+      const token = new User().generateAuthToken();
+      const res = await request(server)
+        .put("/users/:id")
+        .set("x-auth-token", token)
+        .send({
+          username: "ue",
+          password: "password",
+          isSeller: true,
+          isBuyer: false,
+        });
+      expect(res.status).toBe(400);
+    });
+
+    // SAME LOGIC CAN BE APPLIED FOR OTHER INPUT VALIDATION
+
+    it("should return 201 if valid id is passed", async () => {
+      const updatedUser = {
+        username: "username1",
+        password: "password",
+        isSeller: true,
+        isBuyer: true,
+      };
+      const user = new User({
+        username: "username",
+        password: "password",
+        isBuyer: true,
+        isSeller: false,
+      });
+      await user.save();
+      const token = user.generateAuthToken();
+      const res = await request(server)
+        .put("/users/" + user._id)
+        .set("x-auth-token", token)
+        .send(updatedUser);
+      expect(res.status).toBe(201);
+    });
+
+    it("should return 404 if id is not valid", async () => {
+      const updatedUser = {
+        username: "username1",
+        password: "password",
+        isSeller: true,
+        isBuyer: true,
+      };
+      const user = new User({
+        username: "username",
+        password: "password",
+        isBuyer: true,
+        isSeller: false,
+      });
+      await user.save();
+      const token = user.generateAuthToken();
+      const res = await request(server)
+        .put("/users/" + user._id + 1)
+        .set("x-auth-token", token)
+        .send(updatedUser);
+      expect(res.status).toBe(404);
+    });
+  });
+
+  describe("DELETE /:id", () => {
+    it("should return 202 if valid id is passed", async () => {
+      const user = new User({
+        username: "username",
+        password: "password",
+        isBuyer: true,
+        isSeller: false,
+      });
+      await user.save();
+      const token = user.generateAuthToken();
+      const res = await request(server)
+        .delete("/users/" + user._id)
+        .set("x-auth-token", token);
+
+      expect(res.status).toBe(202);
+    });
+
+    it("should return 404 if id is not valid", async () => {
+      const user = new User({
+        username: "username",
+        password: "password",
+        isBuyer: true,
+        isSeller: false,
+      });
+      await user.save();
+      const token = user.generateAuthToken();
+      const res = await request(server)
+        .delete("/users/" + user._id + 1)
+        .set("x-auth-token", token);
+      expect(res.status).toBe(404);
+    });
   });
 });
